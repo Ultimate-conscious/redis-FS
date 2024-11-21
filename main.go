@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/Ultimate-conscious/redis-FS/resp"
 )
 
 var _ = net.Listen
@@ -12,15 +14,14 @@ var _ = os.Exit
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 	for {
-		buf := make([]byte, 1024)
-
-		_, err := conn.Read(buf)
-
+		resp_ := resp.NewResp(conn)
+		val, err := resp_.Read()
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 			break
 		}
-		conn.Write([]byte("+PONG\r\n"))
+		fmt.Println("Received: ", val)
+		conn.Write([]byte("+OK\r\n"))
 
 	}
 }
@@ -32,6 +33,8 @@ func eventLoop(conn <-chan net.Conn) {
 }
 
 func main() {
+
+	fmt.Println("Hello, playground")
 
 	fmt.Println("Logs from your program will appear here!")
 
